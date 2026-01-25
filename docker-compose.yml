@@ -23,7 +23,7 @@ services:
     image: docjv/sis-financeiro:latest
     restart: always
     ports:
-      - "8084:8084"
+      - "8089:8089"
     environment:
       - SPRING_PROFILES_ACTIVE=dev
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db-postgresql:5432/bdfinanceiro

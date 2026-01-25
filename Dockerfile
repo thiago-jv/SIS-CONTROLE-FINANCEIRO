@@ -6,5 +6,5 @@ RUN mvn -f /home/app/pom.xml clean package -DskipTests
 FROM eclipse-temurin:17-jre
 WORKDIR /usr/local/app
 COPY --from=build /home/app/target/financeiro-backend.jar app.jar
-EXPOSE 8084
+EXPOSE 8089
 ENTRYPOINT ["java", "-jar", "app.jar"]
