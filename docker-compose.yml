@@ -15,6 +15,25 @@ services:
     networks:
       - network-new-financeiro
 
+  app-financeiro:
+    container_name: app-financeiro
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: docjv/sis-financeiro:latest
+    restart: always
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-postgresql:5432/bdfinanceiro
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin
+    depends_on:
+      - db-postgresql
+    networks:
+      - network-new-financeiro
+
 volumes:
   pgdata:
 
