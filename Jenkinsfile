@@ -68,7 +68,9 @@ pipeline {
                 script {
                     echo "Deploying to ${params.ENVIRONMENT} environment..."
                     sh """
-                        docker compose -f docker-compose.yml up -d app-financeiro
+                        docker compose stop app-financeiro
+                        docker compose rm -f app-financeiro
+                        SPRING_PROFILES_ACTIVE=${params.ENVIRONMENT} docker compose up -d app-financeiro
                     """
                 }
             }
