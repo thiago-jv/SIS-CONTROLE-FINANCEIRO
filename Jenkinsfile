@@ -14,9 +14,26 @@ pipeline {
         DOCKER_IMAGE = "docjv/sis-financeiro"
         DOCKER_TAG = "${params.ENVIRONMENT}-${env.BUILD_ID}"
         SPRING_PROFILE = "${params.ENVIRONMENT}"
+        GIT_BRANCH = "${params.ENVIRONMENT == 'prod' ? 'main' : 'develop'}"
     }
     
     stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    echo "Checking out branch: ${env.GIT_BRANCH} for environment: ${params.ENVIRONMENT}"
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "*/${env.GIT_BRANCH}"]],
+                        userRemoteConfigs: [[
+                            url: 'https://github.com/samueljdev/SIS-CONTROLE-FINANCEIRO',
+                            credentialsId: 'GIT'
+                        ]]
+                    ])
+                }
+            }
+        }
+        
         stage('Build') {
             steps {
                 sh 'mvn clean package -DskipTests'
