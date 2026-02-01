@@ -1,5 +1,9 @@
 pipeline {
     agent any
+        environment {
+            SONAR_QUBE_URL = 'http://localhost:9000'
+            SONAR_QUBE_TOKEN = '7b2f83dbb39e3ee3a127c23639366fee62de2787'
+        }
     
     environment {
         DOCKER_IMAGE = "docjv/sis-financeiro"
@@ -12,7 +16,24 @@ pipeline {
                 sh 'mvn clean package -DskipTests'
             }
         }
-        
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SONAR_QUBE_SIS-FINANCEIRO') {
+                    sh "${tool 'SONAR_QUBE_SCANNER_SIS_FINACEIRO'}/bin/sonar-scanner -Dsonar.projectKey=SIS-FINANCEIRO -Dsonar.host.url=${env.SONAR_QUBE_URL} -Dsonar.login=${env.SONAR_QUBE_TOKEN} -Dsonar.java.binaries=./"
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                sleep(10)
+                timeout(time: 1, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh """

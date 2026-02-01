@@ -96,11 +96,35 @@ services:
     networks:
       - network-new-financeiro
 
+  sonarqube:
+    container_name: sonar
+    image: sonarqube:9.0-community
+    ports:
+      - "9000:9000"
+    networks:
+      - network-new-financeiro
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=bdfinanceiro
+    depends_on:
+      - db-postgresql
+    volumes:
+      - sonarqube_conf:/opt/sonarqube/conf
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_bundled-plugins:/opt/sonarqube/lib/bundled-plugins
+
+
 volumes:
   pgdata:
   prometheus-data:
   grafana-data:
   loki-data:
+  sonarqube_conf:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_bundled-plugins:
 
 networks:
   network-new-financeiro:
