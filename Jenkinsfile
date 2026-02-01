@@ -68,15 +68,15 @@ pipeline {
                 script {
                     echo "Deploying to ${params.ENVIRONMENT} environment..."
                     sh """
-                        # Garante que o banco está rodando
-                        docker compose up -d db-postgresql
+                        # Verifica se o banco está rodando, se não, inicia
+                        docker ps -q -f name=db-postgresql || docker compose up -d db-postgresql
                         
                         # Para e remove apenas o app
-                        docker compose stop app-financeiro || true
-                        docker compose rm -f app-financeiro || true
+                        docker stop app-financeiro || true
+                        docker rm app-financeiro || true
                         
                         # Recria apenas o app com o profile correto
-                        SPRING_PROFILES_ACTIVE=${params.ENVIRONMENT} docker compose up -d --no-deps app-financeiro
+                        SPRING_PROFILES_ACTIVE=${params.ENVIRONMENT} docker compose up -d --no-deps --force-recreate app-financeiro
                     """
                 }
             }
