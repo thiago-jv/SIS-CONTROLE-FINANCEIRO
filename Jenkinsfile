@@ -11,7 +11,6 @@ pipeline {
     
     environment {
         SONAR_QUBE_URL = 'http://localhost:9000'
-        SONAR_QUBE_TOKEN = '7b2f83dbb39e3ee3a127c23639366fee62de2787'
         DOCKER_IMAGE = "docjv/sis-financeiro"
         DOCKER_TAG = "${params.ENVIRONMENT}-${env.BUILD_ID}"
         SPRING_PROFILE = "${params.ENVIRONMENT}"
@@ -26,8 +25,10 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SONAR_QUBE_SIS-FINANCEIRO') {
-                    sh "${tool 'SONAR_QUBE_SCANNER_SIS_FINACEIRO'}/bin/sonar-scanner -Dsonar.projectKey=SIS-FINANCEIRO -Dsonar.host.url=${env.SONAR_QUBE_URL} -Dsonar.login=${env.SONAR_QUBE_TOKEN} -Dsonar.java.binaries=./"
+                withCredentials([string(credentialsId: 'SONAR_QUBE_TOKEN', variable: 'SONAR_TOKEN')]) {
+                    withSonarQubeEnv('SONAR_QUBE_SIS-FINANCEIRO') {
+                        sh "${tool 'SONAR_QUBE_SCANNER_SIS_FINACEIRO'}/bin/sonar-scanner -Dsonar.projectKey=SIS-FINANCEIRO -Dsonar.host.url=${env.SONAR_QUBE_URL} -Dsonar.login=\${SONAR_TOKEN} -Dsonar.java.binaries=./"
+                    }
                 }
             }
         }
@@ -67,27 +68,31 @@ pipeline {
             steps {
                 script {
                     echo "Deploying to ${params.ENVIRONMENT} environment..."
-                    sh """
-                        # Garante que o banco está rodando
-                        docker ps -q -f name=db-postgresql || docker compose up -d db-postgresql
-                        
-                        # Remove container antigo
-                        docker stop app-financeiro 2>/dev/null || true
-                        docker rm app-financeiro 2>/dev/null || true
-                        
-                        # Inicia nova versão
-                        docker run -d \\
-                            --name app-financeiro \\
-                            --network sis-controle-financeiro_network-new-financeiro \\
-                            -p 8089:8089 \\
-                            -e SPRING_PROFILES_ACTIVE=${params.ENVIRONMENT} \\
-                            -e SPRING_DATASOURCE_URL=jdbc:postgresql://db-postgresql:5432/bdfinanceiro \\
-                            -e SPRING_DATASOURCE_USERNAME=admin \\
-                            -e SPRING_DATASOURCE_PASSWORD=admin \\
-                            ${DOCKER_IMAGE}:${DOCKER_TAG}
-                        
-                        echo "Application deployed: http://localhost:8089"
-                    """
+                    withCredentials([
+                        string(credentialsId: 'DB_USERNAME', variable: 'DB_USERNAME'),
+                        string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD')
+                    ]) {
+                        sh """
+                            # Garante que o banco está rodando
+                            docker ps -q -f name=db-postgresql || docker compose up -d db-postgresql
+                            
+                            # Remove container antigo
+                            docker stop app-financeiro 2>/dev/null || true
+                            docker rm app-financeiro 2>/dev/null || true
+                            
+                            # Inicia nova versão
+                            docker run -d \\
+                                --name app-financeiro \\
+                                --network sis-controle-financeiro_network-new-financeiro \\
+                                -p 8089:8089 \\
+                                -e SPRING_PROFILES_ACTIVE=${params.ENVIRONMENT} \\
+                                -e DB_USERNAME=\${DB_USERNAME} \\
+                                -e DB_PASSWORD=\${DB_PASSWORD} \\
+                                ${DOCKER_IMAGE}:${DOCKER_TAG}
+                            
+                            echo "Application deployed: http://localhost:8089"
+                        """
+                    }
                 }
             }
         }
