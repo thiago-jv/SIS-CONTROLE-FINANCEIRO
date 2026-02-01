@@ -65,6 +65,34 @@ services:
       - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
+      - loki
+    networks:
+      - network-new-financeiro
+
+  loki:
+    container_name: loki
+    image: grafana/loki:latest
+    restart: always
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config.yml:/etc/loki/local-config.yaml
+      - loki-data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - network-new-financeiro
+
+  promtail:
+    container_name: promtail
+    image: grafana/promtail:latest
+    restart: always
+    volumes:
+      - ./promtail-config.yml:/etc/promtail/config.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
     networks:
       - network-new-financeiro
 
@@ -72,6 +100,7 @@ volumes:
   pgdata:
   prometheus-data:
   grafana-data:
+  loki-data:
 
 networks:
   network-new-financeiro:

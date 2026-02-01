@@ -1,0 +1,178 @@
+{
+  "dashboard": {
+    "title": "Spring Boot - Logs de Startup",
+    "tags": ["spring-boot", "logs", "startup"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Logs de Startup - Tempo Real",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{container=\"app-financeiro\"} |= \"Starting\" or \"Started\" or \"Tomcat\"",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "showTime": true,
+          "showLabels": false,
+          "showCommonLabels": false,
+          "wrapLogMessage": true,
+          "prettifyLogMessage": false,
+          "enableLogDetails": true,
+          "dedupStrategy": "none",
+          "sortOrder": "Descending"
+        },
+        "gridPos": { "h": 12, "w": 24, "x": 0, "y": 0 }
+      },
+      {
+        "id": 2,
+        "title": "Aplicação Iniciada com Sucesso",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{container=\"app-financeiro\"} |= \"Started FinanceiroApplication\"",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "showTime": true,
+          "showLabels": false,
+          "wrapLogMessage": true,
+          "enableLogDetails": true
+        },
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 }
+      },
+      {
+        "id": 3,
+        "title": "Tempo de Startup (segundos)",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{container=\"app-financeiro\"} |= \"Started FinanceiroApplication\" | regexp \"in (?P<time>\\\\d+\\\\.\\\\d+) seconds\"",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "showTime": true,
+          "wrapLogMessage": true
+        },
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 }
+      },
+      {
+        "id": 4,
+        "title": "Erros Durante Startup",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{container=\"app-financeiro\"} |~ \"ERROR|Exception|Failed\"",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "showTime": true,
+          "showLabels": false,
+          "wrapLogMessage": true,
+          "enableLogDetails": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        },
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 }
+      },
+      {
+        "id": 5,
+        "title": "Warnings Durante Startup",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{container=\"app-financeiro\"} |= \"WARN\"",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "showTime": true,
+          "showLabels": false,
+          "wrapLogMessage": true,
+          "enableLogDetails": true
+        },
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 }
+      },
+      {
+        "id": 6,
+        "title": "Volume de Logs (últimos 5 min)",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "sum(count_over_time({container=\"app-financeiro\"}[1m]))",
+            "refId": "A",
+            "legendFormat": "Total Logs"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "drawStyle": "bars",
+              "lineInterpolation": "linear",
+              "barAlignment": 0,
+              "fillOpacity": 50,
+              "gradientMode": "none"
+            },
+            "color": {
+              "mode": "palette-classic"
+            },
+            "unit": "short"
+          }
+        },
+        "gridPos": { "h": 8, "w": 24, "x": 0, "y": 28 }
+      },
+      {
+        "id": 7,
+        "title": "Inicialização do Tomcat",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{container=\"app-financeiro\"} |= \"Tomcat\"",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "showTime": true,
+          "wrapLogMessage": true,
+          "enableLogDetails": true
+        },
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 36 }
+      },
+      {
+        "id": 8,
+        "title": "Inicialização do JPA/Hibernate",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{container=\"app-financeiro\"} |~ \"HHH|JPA|Hibernate\"",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "showTime": true,
+          "wrapLogMessage": true,
+          "enableLogDetails": true
+        },
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 36 }
+      }
+    ],
+    "refresh": "5s",
+    "time": {
+      "from": "now-15m",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": ["5s", "10s", "30s", "1m", "5m"]
+    }
+  }
+}
