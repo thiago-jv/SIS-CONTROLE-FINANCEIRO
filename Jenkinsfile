@@ -1,11 +1,9 @@
 pipeline {
     agent any
-        environment {
-            SONAR_QUBE_URL = 'http://localhost:9000'
-            SONAR_QUBE_TOKEN = '7b2f83dbb39e3ee3a127c23639366fee62de2787'
-        }
     
     environment {
+        SONAR_QUBE_URL = 'http://localhost:9000'
+        SONAR_QUBE_TOKEN = '7b2f83dbb39e3ee3a127c23639366fee62de2787'
         DOCKER_IMAGE = "docjv/sis-financeiro"
         DOCKER_TAG = "${env.BUILD_ID}"
     }
