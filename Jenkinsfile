@@ -68,15 +68,25 @@ pipeline {
                 script {
                     echo "Deploying to ${params.ENVIRONMENT} environment..."
                     sh """
-                        # Verifica se o banco está rodando, se não, inicia
+                        # Garante que o banco está rodando
                         docker ps -q -f name=db-postgresql || docker compose up -d db-postgresql
                         
-                        # Para e remove apenas o app
-                        docker stop app-financeiro || true
-                        docker rm app-financeiro || true
+                        # Remove container antigo
+                        docker stop app-financeiro 2>/dev/null || true
+                        docker rm app-financeiro 2>/dev/null || true
                         
-                        # Recria apenas o app com o profile correto
-                        SPRING_PROFILES_ACTIVE=${params.ENVIRONMENT} docker compose up -d --no-deps --force-recreate app-financeiro
+                        # Inicia nova versão
+                        docker run -d \\
+                            --name app-financeiro \\
+                            --network sis-controle-financeiro_network-new-financeiro \\
+                            -p 8089:8089 \\
+                            -e SPRING_PROFILES_ACTIVE=${params.ENVIRONMENT} \\
+                            -e SPRING_DATASOURCE_URL=jdbc:postgresql://db-postgresql:5432/bdfinanceiro \\
+                            -e SPRING_DATASOURCE_USERNAME=admin \\
+                            -e SPRING_DATASOURCE_PASSWORD=admin \\
+                            ${DOCKER_IMAGE}:${DOCKER_TAG}
+                        
+                        echo "Application deployed: http://localhost:8089"
                     """
                 }
             }
