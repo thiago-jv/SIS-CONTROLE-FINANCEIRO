@@ -95,8 +95,12 @@ pipeline {
                             export DB_PASSWORD=\${DB_PASSWORD}
                             export SPRING_PROFILES_ACTIVE=${params.ENVIRONMENT}
                             
+                            # Remove container antigo da aplicação
+                            docker stop app-financeiro 2>/dev/null || true
+                            docker rm app-financeiro 2>/dev/null || true
+                            
                             # Recria apenas o container da aplicação
-                            docker compose up -d --force-recreate --no-deps app-financeiro
+                            docker compose up -d --no-deps app-financeiro
                             
                             # Aguarda a aplicação iniciar
                             sleep 10
