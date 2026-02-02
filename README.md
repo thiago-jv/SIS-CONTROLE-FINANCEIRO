@@ -10,13 +10,13 @@ Sistema de controle financeiro desenvolvido com Spring Boot 3.4.11, Java 17 e Po
 
 Escolha o guia apropriado para sua necessidade:
 
-### 💻 [README-LOCAL.md](README-LOCAL.md) - Desenvolvimento Local
+### 💻 README-LOCAL.md - Desenvolvimento Local
 Guia completo para rodar a aplicação localmente no IntelliJ IDEA ou via linha de comando.
 - Configuração do ambiente local
 - Execução no IntelliJ IDEA
 - Troubleshooting de desenvolvimento
 
-### 🚀 [README-PIPELINE.md](README-PIPELINE.md) - CI/CD com Jenkins
+### 🚀 README-PIPELINE.md - CI/CD com Jenkins
 Guia completo para configurar e executar a pipeline Jenkins com SonarQube e observabilidade.
 - Configuração do Jenkins
 - Pipeline CI/CD completa
@@ -59,34 +59,10 @@ Sistema backend para controle financeiro com:
 - Docker Compose 2.0+
 - IntelliJ IDEA (recomendado)
 
-## ⚡ Quick Start
-
-### Desenvolvimento Local
-```bash
-# 1. Clone o projeto
-git clone https://github.com/samueljdev/SIS-CONTROLE-FINANCEIRO.git
-cd SIS-CONTROLE-FINANCEIRO
-
-# 2. Inicie o PostgreSQL
-docker compose up -d db-postgresql
-
-# 3. Abra no IntelliJ IDEA e configure:
-#    Run → Edit Configurations → Environment variables:
-#    DB_USERNAME=admin;DB_PASSWORD=admin
-#    VM options: -Dspring.profiles.active=local
-
-# 4. Execute a aplicação (Shift + F10)
-```
-
-### Acessar Aplicação
-- API: http://localhost:8089
-- Swagger: http://localhost:8089/swagger-ui/index.html
-- Health: http://localhost:8089/actuator/health
-
 ## 📖 Documentação Completa
 
-- **[README-LOCAL.md](README-LOCAL.md)** → Desenvolvimento local detalhado
-- **[README-PIPELINE.md](README-PIPELINE.md)** → CI/CD e Jenkins detalhado
+- **README-LOCAL.md** → Desenvolvimento local detalhado
+- **README-PIPELINE.md** → CI/CD e Jenkins detalhado
 
 ## 👥 Autores
 
