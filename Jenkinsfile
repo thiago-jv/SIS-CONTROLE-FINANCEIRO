@@ -90,24 +90,19 @@ pipeline {
                         string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD')
                     ]) {
                         sh """
-                            # Garante que o banco está rodando
-                            docker ps -q -f name=db-postgresql || docker compose up -d db-postgresql
+                            # Exporta variáveis para o docker compose
+                            export DB_USERNAME=\${DB_USERNAME}
+                            export DB_PASSWORD=\${DB_PASSWORD}
+                            export SPRING_PROFILES_ACTIVE=${params.ENVIRONMENT}
                             
-                            # Remove container antigo
-                            docker stop app-financeiro 2>/dev/null || true
-                            docker rm app-financeiro 2>/dev/null || true
-                            
-                            # Inicia nova versão
-                            docker run -d \\
-                                --name app-financeiro \\
-                                --network sis-controle-financeiro_network-new-financeiro \\
-                                -p 8089:8089 \\
-                                -e SPRING_PROFILES_ACTIVE=${params.ENVIRONMENT} \\
-                                -e DB_USERNAME=\${DB_USERNAME} \\
-                                -e DB_PASSWORD=\${DB_PASSWORD} \\
-                                ${DOCKER_IMAGE}:${DOCKER_TAG}
+                            # Deploy usando docker compose
+                            docker compose down app-financeiro || true
+                            docker compose pull app-financeiro
+                            docker compose up -d
                             
                             echo "Application deployed: http://localhost:8089"
+                            echo "Grafana: http://localhost:3000"
+                            echo "Prometheus: http://localhost:9090"
                         """
                     }
                 }
