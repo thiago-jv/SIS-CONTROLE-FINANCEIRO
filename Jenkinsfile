@@ -95,14 +95,14 @@ pipeline {
                             export DB_PASSWORD=\${DB_PASSWORD}
                             export SPRING_PROFILES_ACTIVE=${params.ENVIRONMENT}
                             
-                            # Deploy usando docker compose
-                            docker compose down app-financeiro || true
-                            docker compose pull app-financeiro
-                            docker compose up -d
+                            # Recria apenas o container da aplicação
+                            docker compose up -d --force-recreate --no-deps app-financeiro
+                            
+                            # Aguarda a aplicação iniciar
+                            sleep 10
                             
                             echo "Application deployed: http://localhost:8089"
-                            echo "Grafana: http://localhost:3000"
-                            echo "Prometheus: http://localhost:9090"
+                            echo "Health check: http://localhost:8089/actuator/health"
                         """
                     }
                 }
